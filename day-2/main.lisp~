@@ -1,0 +1,24 @@
+(defun day-2-p-1 (fpath)
+  (let ((l1 '())
+	(safe-report-count 0)
+	(current nil)
+	(flag nil))
+    (with-open-file (stream fpath)
+      (with-output-to-string (st)
+	(loop for line = (read-line stream nil) while line do
+	  (push (mapcar #'parse-integer (split-sequence:split-sequence #\Space line :remove-empty-subseqs t)) l1))))
+    (setf l1 (reverse l1))
+    (loop for sublist in l1 do
+      (setf current (car sublist))
+      (tagbody
+       h1
+	 (when flag (progn (incf safe-report-count) (setf flag nil) (go h3)))
+       h2
+	 (if (or (and (< current (cadr current)) (< (- (cadr current) current) 4))
+		 (and (> current (cadr current)) (< (- current (cadr current) 4))))
+	     (progn (setf current (car current))
+		    (when (equal (cdr current) nil) (progn (setf flag t) (go h1)))
+		    (go h2))
+	     (setf flag nil))
+       h3))
+    safe-report-count))
